@@ -50,5 +50,6 @@ RUN apt-get update && \
 # Copy build and install scripts
 COPY build.sh install.sh /tmp/ompl/
 
+RUN pip3 install build wheel
 # Execute the install script, fallback to build if install fails
 RUN /tmp/ompl/install.sh || /tmp/ompl/build.sh
