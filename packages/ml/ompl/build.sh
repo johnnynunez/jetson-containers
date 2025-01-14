@@ -8,13 +8,17 @@ git clone --depth=1 --recursive https://github.com/ompl/ompl /opt/ompl
 # Navigate to the directory containing ompl's setup.py
 cd /opt/ompl 
 
+pip3 install 'numpy<2' pyplusplus pygccxml
+pip3 install 'numpy<2'
+
 export MAX_JOBS=$(nproc)
 mkdir -p build/Release
 cd build/Release
 cmake ../..
 # next step is optional
-make -j MAX_JOBS update_bindings # if you want Python bindings
-make -j MAX_JOBS
+make -j ${MAX_JOBS} update_bindings # if you want Python bindings
+make -j ${MAX_JOBS}
+make install
 pip3 wheel --no-build-isolation --wheel-dir=/opt/ompl/wheels .
 pip3 install --no-cache-dir --verbose /opt/ompl/wheels/ompl_ssm*.whl
 
