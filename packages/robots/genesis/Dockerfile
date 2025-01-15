@@ -15,95 +15,24 @@ ARG GENESIS_VERSION \
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libglfw3-dev \
+    libglm-dev \
+    liblz4-dev \
+    libssl-dev \
+    libtinfo-dev \
+    libwayland-dev \
+    libx11-xcb-dev \
+    libxcb-dri3-dev \
+    libxcb-ewmh-dev \
+    libxcb-keysyms1-dev \
+    libxcb-randr0-dev \
+    libzstd-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
 COPY build.sh install.sh /tmp/GENESIS/
-
-# Install necessary packages
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    manpages-dev \
-    libvulkan-dev \
-    zlib1g-dev \
-    xorg-dev libglu1-mesa-dev \
-    libsnappy-dev \
-    software-properties-common \
-    git \
-    curl \
-    wget
-
-RUN add-apt-repository ppa:ubuntu-toolchain-r/test && \
-    apt update && \
-    apt install -y --no-install-recommends \
-    gcc-11 \
-    g++-11 \
-    gcc-11 g++-11 patchelf && \
-    rm -rf /var/lib/apt/lists/*
-
-# Set GCC-11 and G++-11 as the default
-RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110 && \
-    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 110
-
-RUN pip3 install "pybind11[global]"
-
-# Build LuisaRender
-WORKDIR /workspace
-RUN git clone https://github.com/Genesis-Embodied-AI/Genesis.git && \
-    cd Genesis && \
-    git submodule update --init --recursive
-COPY build_luisa.sh /workspace/build_luisa.sh
-RUN chmod +x ./build_luisa.sh && ./build_luisa.sh ${PYTHON_VERSION}
-
-# ===============================================================
-# Stage 2: Runtime Environment
-# ===============================================================
-
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    tmux \
-    git \
-    curl \
-    wget \
-    bash-completion \
-    libgl1 \
-    libgl1-mesa-glx \
-    libegl-dev \
-    libegl1 \
-    libxrender1 \
-    libglib2.0-0 \
-    ffmpeg \
-    libgtk2.0-dev \
-    pkg-config \
-    libvulkan-dev \
-    libgles2 \
-    libglvnd0 \
-    libglx0 \
-    && apt clean \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /workspace
-
-# --------------------------- Genesis ----------------------------
-RUN pip install --no-cache-dir open3d
-RUN git clone https://github.com/Genesis-Embodied-AI/Genesis.git && \
-    cd Genesis && \
-    pip install . && \
-    pip install --no-cache-dir PyOpenGL==3.1.5
-
-# -------------------- Surface Reconstruction --------------------
-# Set the LD_LIBRARY_PATH directly in the environment
-COPY --from=builder /workspace/Genesis/genesis/ext/ParticleMesher/ParticleMesherPy /usr/local/lib/python3.10/site-packages/genesis/ext/ParticleMesher/ParticleMesherPy
-ENV LD_LIBRARY_PATH=/usr/local/lib/python3.10/site-packages/genesis/ext/ParticleMesher/ParticleMesherPy:$LD_LIBRARY_PATH
-
-# --------------------- Ray Tracing Renderer ---------------------
-# Copy LuisaRender build artifacts from the builder stage
-COPY --from=builder /workspace/Genesis/genesis/ext/LuisaRender/build/bin /usr/local/lib/python3.10/site-packages/genesis/ext/LuisaRender/build/bin
-# fix GLIBCXX_3.4.30 not found
-RUN cd /usr/local/lib && \
-    mv libstdc++.so.6 libstdc++.so.6.old && \
-    ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 libstdc++.so.6
-
-# COPY 10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
-# COPY nvidia_icd.json /usr/share/vulkan/icd.d/nvidia_icd.json
-# COPY nvidia_layers.json /etc/vulkan/implicit_layer.d/nvidia_layers.json
 
 RUN /tmp/GENESIS/install.sh || /tmp/GENESIS/build.sh
 
