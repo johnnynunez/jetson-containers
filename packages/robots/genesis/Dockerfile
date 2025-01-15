@@ -2,7 +2,7 @@
 # name: genesis
 # group: robots
 # config: config.py
-# depends: [rust, cmake, pytorch, torchvision, torchaudio, pymeshlab, openexr]
+# depends: [rust, cmake, pytorch, torchvision, torchaudio, pymeshlab, openexr, ompl]
 # requires: '>=34.1.0'
 # notes: https://github.com/Genesis-Embodied-AI/Genesis.git
 #---
@@ -16,7 +16,6 @@ ARG GENESIS_VERSION \
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY build.sh install.sh /tmp/GENESIS/
-RUN /tmp/GENESIS/install.sh
 
 # Install necessary packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -29,7 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     software-properties-common \
     git \
     curl \
-    wget \
+    wget
 
 RUN add-apt-repository ppa:ubuntu-toolchain-r/test && \
     apt update && \
@@ -89,28 +88,22 @@ RUN git clone https://github.com/Genesis-Embodied-AI/Genesis.git && \
     pip install . && \
     pip install --no-cache-dir PyOpenGL==3.1.5
 
-# ------------------------ Motion planning ----------------------- # NEEDS TO BE FIXED
-RUN PYTHON_MAJOR_MINOR=$(echo ${PYTHON_VERSION} | tr -d '.') && \
-    wget https://github.com/ompl/ompl/releases/download/prerelease/ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-arm64.whl && \
-    pip install ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-arm64.whl && \
-    rm ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-arm64.whl
-
 # -------------------- Surface Reconstruction --------------------
 # Set the LD_LIBRARY_PATH directly in the environment
-COPY --from=builder /workspace/Genesis/genesis/ext/ParticleMesher/ParticleMesherPy /opt/conda/lib/python3.1/site-packages/genesis/ext/ParticleMesher/ParticleMesherPy
-ENV LD_LIBRARY_PATH=/opt/conda/lib/python3.1/site-packages/genesis/ext/ParticleMesher/ParticleMesherPy:$LD_LIBRARY_PATH
+COPY --from=builder /workspace/Genesis/genesis/ext/ParticleMesher/ParticleMesherPy /usr/local/lib/python3.10/site-packages/genesis/ext/ParticleMesher/ParticleMesherPy
+ENV LD_LIBRARY_PATH=/usr/local/lib/python3.10/site-packages/genesis/ext/ParticleMesher/ParticleMesherPy:$LD_LIBRARY_PATH
 
 # --------------------- Ray Tracing Renderer ---------------------
 # Copy LuisaRender build artifacts from the builder stage
-COPY --from=builder /workspace/Genesis/genesis/ext/LuisaRender/build/bin /opt/conda/lib/python3.1/site-packages/genesis/ext/LuisaRender/build/bin
+COPY --from=builder /workspace/Genesis/genesis/ext/LuisaRender/build/bin /usr/local/lib/python3.10/site-packages/genesis/ext/LuisaRender/build/bin
 # fix GLIBCXX_3.4.30 not found
-RUN cd /opt/conda/lib && \
+RUN cd /usr/local/lib && \
     mv libstdc++.so.6 libstdc++.so.6.old && \
     ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 libstdc++.so.6
 
-COPY 10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
-COPY nvidia_icd.json /usr/share/vulkan/icd.d/nvidia_icd.json
-COPY nvidia_layers.json /etc/vulkan/implicit_layer.d/nvidia_layers.json
+# COPY 10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
+# COPY nvidia_icd.json /usr/share/vulkan/icd.d/nvidia_icd.json
+# COPY nvidia_layers.json /etc/vulkan/implicit_layer.d/nvidia_layers.json
 
-ENTRYPOINT ["/bin/bash"]
+RUN /tmp/GENESIS/install.sh || /tmp/GENESIS/build.sh
 
