@@ -4,8 +4,6 @@ set -ex
 wget https://apt.llvm.org/llvm.sh
 chmod u+x llvm.sh
 ./llvm.sh 18 all
-ln -sf /usr/bin/llvm-config-* /usr/bin/llvm-config
-ln -s /usr/bin/clang-1* /usr/bin/clang
 
 echo "Setting up environment for genesis ${GENESIS_VERSION}"
 
