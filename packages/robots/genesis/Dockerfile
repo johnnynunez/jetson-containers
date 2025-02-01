@@ -81,10 +81,14 @@ pip3 install . && \
 pip3 install --no-cache-dir PyOpenGL==3.1.5
 
 # ------------------------ Motion planning -----------------------
-RUN PYTHON_MAJOR_MINOR=$(echo ${PYTHON_VERSION} | tr -d '.') && \
-    wget https://github.com/johnnynunez/ompl/releases/download/prerelease/ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-manylinux_2_28_aarch64.whl && \
-    pip install ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-manylinux_2_28_aarch64.whl && \
-    rm ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-manylinux_2_28_aarch64.whl
+# RUN PYTHON_MAJOR_MINOR=$(echo ${PYTHON_VERSION} | tr -d '.') && \
+#     wget https://github.com/johnnynunez/ompl/releases/download/prerelease/ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-manylinux_2_28_aarch64.whl && \
+#     pip install ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-manylinux_2_28_aarch64.whl && \
+#     rm ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-manylinux_2_28_aarch64.whl
+RUN wget https://ompl.kavrakilab.org/core/install-ompl-ubuntu.sh \
+    && chmod u+x install-ompl-ubuntu.sh \
+    && ./install-ompl-ubuntu.sh --python --github \
+    && rm install-ompl-ubuntu.sh \
 
 # -------------------- Surface Reconstruction --------------------
 # Set the LD_LIBRARY_PATH directly in the environment

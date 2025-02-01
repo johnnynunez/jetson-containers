@@ -51,8 +51,3 @@ RUN apt-get update && \
 
 RUN git clone --recursive splashsurf /opt/splashsurf
 RUN cargo install splashsurf
-
-RUN cd /opt/
-RUN pip3 install build wheel
-
-RUN /tmp/splashsurf/install.sh || /tmp/splashsurf/build.sh
