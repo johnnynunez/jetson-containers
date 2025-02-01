@@ -1,7 +1,6 @@
 #---
 # name: splashsurf
 # group: robots
-# config: config.py
 # depends: [cuda, rust, cmake]
 # requires: '>=34.1.0'
 # notes: https://github.com/InteractiveComputerGraphics/splashsurf
@@ -49,5 +48,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 
-RUN git clone --recursive splashsurf /opt/splashsurf
+RUN git clone --recursive https://github.com/InteractiveComputerGraphics/splashsurf /opt/splashsurf
+RUN cd /opt/splashsurf
 RUN cargo install splashsurf
