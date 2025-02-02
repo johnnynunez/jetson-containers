@@ -7,6 +7,11 @@ git clone --depth=1 --recursive https://github.com/johnnynunez/taichi  /opt/taic
 
 # Navigate to the Taichi repository directory
 cd /opt/taichi
+# Apply the inline assembly fix for ARM64 CUDA
+sed -i 's/"l"(value)/"r"(value)/g' taichi/runtime/llvm/runtime_module/runtime.cpp
+# Optionally, add 'w' modifiers:
+sed -i 's/match\.any\.sync\.b64  %0/match\.any\.sync\.b64  %w0/g; s/, %1/, %w1/g; s/, %2/, %w2/g' taichi/runtime/llvm/runtime_module/runtime.cpp
+
 
 # Download the LLVM installer script and make it executable
 wget -q https://apt.llvm.org/llvm.sh
@@ -27,8 +32,8 @@ ln -sf /usr/bin/llvm-config-* /usr/bin/llvm-config
 
 # Set environment variables for the build
 export MAX_JOBS=$(nproc)
-# export TAICHI_CMAKE_ARGS="-DTI_WITH_VULKAN:BOOL=ON -DTI_WITH_CUDA:BOOL=ON -DTI_CUDA_ARCHS=${CUDAARCHS}"
-export TAICHI_CMAKE_ARGS="-DTI_WITH_VULKAN:BOOL=ON -DTI_WITH_CUDA:BOOL=OFF"
+export TAICHI_CMAKE_ARGS="-DTI_WITH_VULKAN:BOOL=ON -DTI_WITH_CUDA:BOOL=ON"
+# export TAICHI_CMAKE_ARGS="-DTI_WITH_VULKAN:BOOL=ON -DTI_WITH_CUDA:BOOL=OFF"
 export CC=/usr/lib/llvm-15/bin/clang
 export CXX=/usr/lib/llvm-15/bin/clang++
 
