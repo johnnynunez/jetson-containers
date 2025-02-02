@@ -3,7 +3,7 @@
 # group: genesis
 # config: config.py
 # depends: [ninja, cmake, rust]
-# requires: '>=34.1.0'
+# requires: '>=36.0.0'
 # test: test.py
 # notes: https://github.com/taichi-dev/taichi
 #---
