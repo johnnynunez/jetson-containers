@@ -2,10 +2,8 @@
 set -ex
 
 # Clone the repository if it doesn't exist
-if [ ! -d /opt/taichi ]; then
-    git clone --branch=v${TAICHI_VERSION:-1.7.4} --depth=1 --recursive https://github.com/johnnynunez/taichi /opt/taichi || \
-    git clone --depth=1 --recursive https://github.com/johnnynunez/taichi /opt/taichi
-fi
+git clone --branch=v${TAICHI_VERSION} --depth=1 --recursive https://github.com/johnnynunez/taichi /opt/taichi  || \
+git clone --depth=1 --recursive https://github.com/johnnynunez/taichi  /opt/taichi
 
 # Navigate to the Taichi repository directory
 cd /opt/taichi
