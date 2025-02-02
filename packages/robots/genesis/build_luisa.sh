@@ -8,7 +8,7 @@ fi
 
 PYTHON_VERSION=$1
 
-cd Genesis/genesis/ext/LuisaRender && \
+cd /opt/genesis/genesis/ext/LuisaRender && \
 git submodule update --init --recursive && \
 mkdir -p build && \
 cmake -S . -B build \

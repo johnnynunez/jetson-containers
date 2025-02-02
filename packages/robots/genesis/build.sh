@@ -2,11 +2,10 @@
 set -ex
 
 # Clone the repository if it doesn't exist
-if [ ! -d /opt/genesis ]; then
-    echo "Cloning genesis version ${GENESIS_VERSION}"
-    git clone --branch=v${GENESIS_VERSION} --depth=1 --recursive https://github.com/Genesis-Embodied-AI/Genesis.git /opt/genesis ||
-    git clone --depth=1 --recursive https://github.com/Genesis-Embodied-AI/Genesis.git /opt/genesis
-fi
+echo "Cloning genesis version ${GENESIS_VERSION}"
+git clone --branch=v${GENESIS_VERSION} --depth=1 --recursive https://github.com/Genesis-Embodied-AI/Genesis.git /opt/genesis ||
+git clone --depth=1 --recursive https://github.com/Genesis-Embodied-AI/Genesis.git /opt/genesis
+
 
 # Navigate to the directory containing PyMeshLab's setup.py
 cd /opt/genesis && \
