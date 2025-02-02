@@ -10,7 +10,8 @@
 ARG BASE_IMAGE
 FROM ${BASE_IMAGE}
 
-ARG TAICHI_VERSION
+ARG TAICHI_VERSION \
+    CUDAARCHS
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tmux \
