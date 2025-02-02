@@ -12,6 +12,51 @@ FROM ${BASE_IMAGE}
 
 ARG TAICHI_VERSION
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tmux \
+    git \
+    curl \
+    build-essential \
+    gcc \
+    g++ \
+    clang \
+    wget \
+    bash-completion \
+    libgl1 \
+    libgl1-mesa-glx \
+    libegl-dev \
+    libegl1 \
+    libxrender1 \
+    libglib2.0-0 \
+    ffmpeg \
+    libgtk2.0-dev \
+    pkg-config \
+    libvulkan-dev \
+    libgles2 \
+    libglvnd0 \
+    libglx0 \
+    freeglut3-dev \
+    libglfw3-dev \
+    libglm-dev \
+    libglu1-mesa-dev \
+    liblz4-dev \
+    libssl-dev \
+    libtinfo-dev \
+    libwayland-dev \
+    libx11-xcb-dev \
+    libxcb-dri3-dev \
+    libxcb-ewmh-dev \
+    libxcb-keysyms1-dev \
+    libxcb-randr0-dev \
+    libxcursor-dev \
+    libxi-dev \
+    libxinerama-dev \
+    libxrandr-dev \
+    libzstd-dev \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/*
+
+
 COPY build.sh install.sh /tmp/TAICHI/
 
 RUN /tmp/TAICHI/install.sh || /tmp/TAICHI/build.sh

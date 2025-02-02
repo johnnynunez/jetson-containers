@@ -6,7 +6,12 @@ git clone --branch=v${TAICHI_VERSION} --depth=1 --recursive https://github.com/j
 git clone --depth=1 --recursive https://github.com/johnnynunez/taichi  /opt/taichi
 
 # Navigate to the directory containing mamba's setup.py
-cd /opt/taichi  
+cd /opt/taichi
+
+wget https://apt.llvm.org/llvm.sh
+chmod +x llvm.sh
+./llvm.sh 17 all
+ln -sf /usr/bin/llvm-config-* /usr/bin/llvm-config
 
 export MAX_JOBS=$(nproc)
 export TAICHI_CMAKE_ARGS="-DTI_WITH_VULKAN:BOOL=ON -DTI_WITH_CUDA:BOOL=ON"
