@@ -2,7 +2,7 @@
 # name: genesis
 # group: robots
 # config: config.py
-# depends: [rust, cmake, torch, torchvision, torchaudio, taichi, splashsurf]
+# depends: [rust, cmake, torch, torchvision, torchaudio, openexr, pymeshlab, taichi, splashsurf]
 # requires: '>=36.0.0'
 # test: test.py
 # notes: https://github.com/Genesis-Embodied-AI/Genesis.git
@@ -33,17 +33,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     gcc-11 \
     g++-11 \
+    uuid-dev \
     patchelf && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip install "pybind11[global]"
+RUN pip3 install "pybind11[global]"
 
 # Build LuisaRender
 WORKDIR /workspace
 RUN git clone --recursive https://github.com/Genesis-Embodied-AI/Genesis /opt/genesis && \
     cd /opt/genesis
 COPY build_luisa.sh /workspace/build_luisa.sh
-RUN chmod +x ./build_luisa.sh && ./build_luisa.sh ${PYTHON_VERSION}
+# RUN chmod +x ./build_luisa.sh && ./build_luisa.sh ${PYTHON_VERSION} # FIX ME!
 
 # ===============================================================
 # Stage 2: Runtime Environment
@@ -75,20 +76,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /workspace
 
 # --------------------------- Genesis ----------------------------
+# FIX: More robust removal of blinker
+RUN find / -name "blinker*" -print0 | xargs -0 -r rm -rf
+RUN sed -i '/taichi/d' /opt/genesis/pyproject.toml
+
 RUN pip3 install --no-cache-dir open3d && \
 cd /opt/genesis && \
-pip3 install . && \
-pip3 install --no-cache-dir PyOpenGL==3.1.5
+pip3 install .
 
 # ------------------------ Motion planning -----------------------
 # RUN PYTHON_MAJOR_MINOR=$(echo ${PYTHON_VERSION} | tr -d '.') && \
 #     wget https://github.com/johnnynunez/ompl/releases/download/prerelease/ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-manylinux_2_28_aarch64.whl && \
-#     pip install ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-manylinux_2_28_aarch64.whl && \
+#     pip3 install ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-manylinux_2_28_aarch64.whl && \
 #     rm ompl-1.6.0-cp${PYTHON_MAJOR_MINOR}-cp${PYTHON_MAJOR_MINOR}-manylinux_2_28_aarch64.whl
 RUN wget https://ompl.kavrakilab.org/core/install-ompl-ubuntu.sh \
     && chmod u+x install-ompl-ubuntu.sh \
     && ./install-ompl-ubuntu.sh --python --github \
-    && rm install-ompl-ubuntu.sh \
+    && rm install-ompl-ubuntu.sh
 
 # -------------------- Surface Reconstruction --------------------
 # Set the LD_LIBRARY_PATH directly in the environment
@@ -97,6 +101,6 @@ ENV LD_LIBRARY_PATH=/usr/local/lib/python3.10/site-packages/genesis/ext/Particle
 
 # --------------------- Ray Tracing Renderer ---------------------
 # Copy LuisaRender build artifacts from the builder stage
-COPY --from=builder /workspace/Genesis/genesis/ext/LuisaRender/build/bin /usr/local/lib/python3.10/site-packages/genesis/ext/LuisaRender/build/bin
+# COPY --from=builder /workspace/Genesis/genesis/ext/LuisaRender/build/bin /usr/local/lib/python3.10/site-packages/genesis/ext/LuisaRender/build/bin FIX ABOVE
 
 ENTRYPOINT ["/bin/bash"]
