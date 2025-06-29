@@ -21,7 +21,7 @@ CMAKE_ARGS="${LLAMA_CPP_FLAGS} -DLLAVA_BUILD=OFF -DCMAKE_CUDA_ARCHITECTURES=${CU
 pip3 wheel --wheel-dir=${PIP_WHEEL_DIR} --verbose .
 
 pip3 install ${PIP_WHEEL_DIR}/llama_cpp_python*.whl
-pip3 show llama-cpp-python
+# pip3 show llama-cpp-python
 
 python3 -c 'import llama_cpp'
 python3 -m llama_cpp.server --help
