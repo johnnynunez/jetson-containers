@@ -3,9 +3,11 @@ set -ex
 echo "Installing NVIDIA NCCL $NCCL_VERSION (NCCL)"
 if [[ "$CUDA_ARCH" == "aarch64" ]]; then
   DEB="nccl-local-repo-${DISTRO}-${NCCL_VERSION}-cuda13.0_1.0-1_arm64.deb"
-else
+if [[ "$CUDA_ARCH" == "amd64" ]]; then
   DEB="nccl-local-repo-${DISTRO}-${NCCL_VERSION}-cuda13.0_1.0-1_amd64.deb"
-fi
+else
+  echo "Tegra not compatible with NCCL"
+fi  
 cd $TMP
 wget $WGET_FLAGS $MULTIARCH_URL/$DEB
 if [[ "$CUDA_ARCH" != "tegra-aarch64" ]]; then
