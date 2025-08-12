@@ -70,3 +70,12 @@ python3 -c 'import torch; \
     print(f"cuDNN version  : {torch.backends.cudnn.version()}");'
 # PyTorch C++ extensions frequently use ninja parallel builds
 pip3 install scikit-build ninja
+
+# temporary patches to enable newer blackwell sm's
+if [[ "$(uname -m)" == "aarch64" && ${TORCH_VERSION} == "2.9" ]]; then
+  PYTHON_ROOT=`pip3 show torch | grep Location: | cut -d' ' -f2`
+  TORCH_PATCH="$PYTHON_ROOT/torch/utils/cpp_extension.py"
+  echo "patching ${TORCH_PATCH}"
+  sed -i "s|'10.0']|'10.0', '10.0a', '11.0', '11.0a', '12.0', '12.0a', '12.1', '12.1a']|" ${TORCH_PATCH}
+  cat ${TORCH_PATCH} | grep '10.0'
+fi
