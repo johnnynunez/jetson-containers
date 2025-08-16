@@ -9,7 +9,7 @@ if [[ "$CUDA_ARCH" == "aarch64" ]]; then
   dpkg -i nvshmem-local-*.deb
   cp /var/nvshmem-local-*/nvshmem-*-keyring.gpg /usr/share/keyrings/
   apt-get update
-  apt-get -y install nvshmem
+  apt-get -y install nvshmem-cuda-13
 
 elif [[ "$CUDA_ARCH" == "tegra-aarch64" ]]; then
  echo "Not supported on Tegra architecture"
